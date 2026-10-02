@@ -73,8 +73,11 @@ public class TaskServiceImpl implements TaskService {
         if(null==task.getId()){
             throw new IllegalArgumentException("Task  must have an ID!");
         }
-        if(Objects.equals(taskId, task.getId())){
+        if(!Objects.equals(taskId, task.getId())){
             throw new IllegalArgumentException("Task IDs do not match");
+        }
+        if(null==task.getTitle() || task.getTitle().isEmpty()){
+            throw new IllegalArgumentException("Task  must have a title!");
         }
         if(null==task.getPriority()){
             throw new IllegalArgumentException("Task  must have a priority!");
@@ -85,6 +88,7 @@ public class TaskServiceImpl implements TaskService {
 
         Task existingTask=taskRepository.findByTaskListIdAndId(taskListId, taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        existingTask.setTitle(task.getTitle());
         existingTask.setDescription(task.getDescription());
         existingTask.setDueDate(task.getDueDate());
         existingTask.setPriority(task.getPriority());
