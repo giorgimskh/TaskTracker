@@ -1,5 +1,6 @@
 package com.george.tasktracker.services.impl;
 
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import com.george.tasktracker.repositories.TaskListRepository;
 import com.george.tasktracker.domain.entities.TaskList;
 import org.junit.jupiter.api.Test;
@@ -115,7 +116,7 @@ class TaskListServiceImplTest {
         when(taskListRepository.findById(taskListId)).thenReturn(Optional.empty());
         TaskList taskList = new TaskList(taskListId, "list", null, null, null, null);
 
-        assertThrows(IllegalArgumentException.class, () -> taskListService.updateTaskList(taskListId, taskList));
+        assertThrows(ResourceNotFoundException.class, () -> taskListService.updateTaskList(taskListId, taskList));
         verify(taskListRepository, never()).save(any());
     }
 

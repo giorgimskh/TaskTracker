@@ -1,5 +1,6 @@
 package com.george.tasktracker.services.impl;
 
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import com.george.tasktracker.repositories.TaskListRepository;
 import com.george.tasktracker.services.TaskListService;
 import com.george.tasktracker.domain.entities.TaskList;
@@ -56,14 +57,14 @@ public class TaskListServiceImpl implements TaskListService {
     @Override
     public TaskList updateTaskList(UUID taskListId, TaskList taskList) {
         if(null==taskList.getId()){
-            throw new IllegalArgumentException("Task list must have an  ID!");
+            throw new IllegalArgumentException("Task list must have an ID!");
         }
 
         if(!Objects.equals(taskList.getId(), taskListId)){
-            throw new IllegalArgumentException("not permitted to change Task list ID !");
+            throw new IllegalArgumentException("Task list ID cannot be changed!");
         }
         TaskList existingTaskList = taskListRepository.findById(taskListId).orElseThrow(()
-                -> new IllegalArgumentException("task list not found!"));
+                -> new ResourceNotFoundException("Task list not found"));
 
         existingTaskList.setTitle(taskList.getTitle());
         existingTaskList.setDescription(taskList.getDescription());

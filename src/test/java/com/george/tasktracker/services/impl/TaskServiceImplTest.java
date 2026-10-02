@@ -1,5 +1,6 @@
 package com.george.tasktracker.services.impl;
 
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import com.george.tasktracker.repositories.TaskListRepository;
 import com.george.tasktracker.repositories.TaskRepository;
 import com.george.tasktracker.domain.entities.Task;
@@ -99,7 +100,7 @@ class TaskServiceImplTest {
     void createTaskRejectsUnknownTaskList() {
         when(taskListRepository.findById(taskListId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.createTask(taskListId, task(null, "title", null, null)));
         verify(taskRepository, never()).save(any());
     }
@@ -177,7 +178,7 @@ class TaskServiceImplTest {
         when(taskRepository.findByTaskListIdAndId(taskListId, taskId)).thenReturn(Optional.empty());
         Task task = task(taskId, "title", TaskPriority.LOW, TaskStatus.OPEN);
 
-        assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(taskListId, taskId, task));
+        assertThrows(ResourceNotFoundException.class, () -> taskService.updateTask(taskListId, taskId, task));
         verify(taskRepository, never()).save(any());
     }
 

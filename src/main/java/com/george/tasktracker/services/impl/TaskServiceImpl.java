@@ -1,5 +1,6 @@
 package com.george.tasktracker.services.impl;
 
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import com.george.tasktracker.repositories.TaskListRepository;
 import com.george.tasktracker.repositories.TaskRepository;
 import com.george.tasktracker.services.TaskService;
@@ -34,17 +35,17 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task createTask(UUID taskListId, Task task) {
         if(null!=task.getId()){
-            throw new IllegalArgumentException("Task  already has an ID!");
+            throw new IllegalArgumentException("Task already has an ID!");
         }
         if(null==task.getTitle() || task.getTitle().isEmpty()){
-            throw new IllegalArgumentException("Task  must have a title!");
+            throw new IllegalArgumentException("Task must have a title!");
         }
         TaskPriority taskPriority = Optional.ofNullable(task.getPriority()).orElse(TaskPriority.MEDIUM);
         TaskStatus taskStatus = TaskStatus.OPEN;
 
 
         TaskList taskList = taskListRepository.findById(taskListId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid task ID"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task list not found"));
 
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -71,23 +72,23 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task updateTask(UUID taskListId, UUID taskId, Task task) {
         if(null==task.getId()){
-            throw new IllegalArgumentException("Task  must have an ID!");
+            throw new IllegalArgumentException("Task must have an ID!");
         }
         if(!Objects.equals(taskId, task.getId())){
             throw new IllegalArgumentException("Task IDs do not match");
         }
         if(null==task.getTitle() || task.getTitle().isEmpty()){
-            throw new IllegalArgumentException("Task  must have a title!");
+            throw new IllegalArgumentException("Task must have a title!");
         }
         if(null==task.getPriority()){
-            throw new IllegalArgumentException("Task  must have a priority!");
+            throw new IllegalArgumentException("Task must have a priority!");
         }
         if(null==task.getStatus()){
-            throw new IllegalArgumentException("Task  must have a status!");
+            throw new IllegalArgumentException("Task must have a status!");
         }
 
         Task existingTask=taskRepository.findByTaskListIdAndId(taskListId, taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
         existingTask.setTitle(task.getTitle());
         existingTask.setDescription(task.getDescription());
         existingTask.setDueDate(task.getDueDate());
