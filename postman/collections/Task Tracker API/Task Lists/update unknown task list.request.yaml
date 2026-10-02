@@ -16,6 +16,6 @@ scripts:
   - type: afterResponse
     language: text/javascript
     code: |-
-      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("status is 404", () => pm.response.to.have.status(404));
       pm.test("reports not found", () =>
-        pm.expect(pm.response.json().message).to.eql("task list not found!"));
+        pm.expect(pm.response.json().message).to.eql("Task list not found"));

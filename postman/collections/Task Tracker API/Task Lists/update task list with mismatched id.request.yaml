@@ -18,4 +18,4 @@ scripts:
     code: |-
       pm.test("status is 400", () => pm.response.to.have.status(400));
       pm.test("rejects id change", () =>
-        pm.expect(pm.response.json().message).to.eql("not permitted to change Task list ID !"));
+        pm.expect(pm.response.json().message).to.eql("Task list ID cannot be changed!"));

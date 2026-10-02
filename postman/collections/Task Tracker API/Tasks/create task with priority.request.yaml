@@ -1,6 +1,6 @@
 $kind: http-request
 method: POST
-url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+url: '{{base_url}}/api/task-lists/{{task_list_id}}/tasks'
 order: 2000
 headers:
   - key: Content-Type
@@ -17,7 +17,7 @@ scripts:
   - type: afterResponse
     language: text/javascript
     code: |-
-      pm.test("status is 200", () => pm.response.to.have.status(200));
+      pm.test("status is 201", () => pm.response.to.have.status(201));
       const body = pm.response.json();
       pm.test("keeps client priority", () => pm.expect(body.priority).to.eql("HIGH"));
       pm.test("ignores client status, always OPEN", () => pm.expect(body.status).to.eql("OPEN"));

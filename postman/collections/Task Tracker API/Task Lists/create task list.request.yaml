@@ -16,7 +16,7 @@ scripts:
   - type: afterResponse
     language: text/javascript
     code: |-
-      pm.test("status is 200", () => pm.response.to.have.status(200));
+      pm.test("status is 201", () => pm.response.to.have.status(201));
       const body = pm.response.json();
       pm.test("server assigns an id", () => pm.expect(body.id).to.be.a("string").and.not.empty);
       pm.test("echoes title and description", () => {

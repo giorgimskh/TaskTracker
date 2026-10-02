@@ -1,6 +1,6 @@
 $kind: http-request
 method: PUT
-url: '{{base_url}}/task_list/{{task_list_id}}/tasks/{{task_id}}'
+url: '{{base_url}}/api/task-lists/{{task_list_id}}/tasks/{{task_id}}'
 order: 8000
 headers:
   - key: Content-Type

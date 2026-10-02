@@ -1,6 +1,6 @@
 $kind: http-request
 method: PUT
-url: '{{base_url}}/task_list/{{task_list_id}}/tasks/{{task_id}}'
+url: '{{base_url}}/api/task-lists/{{task_list_id}}/tasks/{{task_id}}'
 order: 10000
 headers:
   - key: Content-Type
@@ -19,4 +19,4 @@ scripts:
     code: |-
       pm.test("status is 400", () => pm.response.to.have.status(400));
       pm.test("requires a priority", () =>
-        pm.expect(pm.response.json().message).to.eql("Task  must have a priority!"));
+        pm.expect(pm.response.json().message).to.eql("Task must have a priority!"));

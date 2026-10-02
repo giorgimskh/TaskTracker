@@ -1,6 +1,6 @@
 $kind: http-request
 method: GET
-url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+url: '{{base_url}}/api/task-lists/{{task_list_id}}/tasks'
 order: 3000
 scripts:
   - type: afterResponse

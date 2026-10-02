@@ -1,6 +1,6 @@
 $kind: http-request
 method: PUT
-url: '{{base_url}}/task_list/{{unknown_id}}/tasks/{{task_id}}'
+url: '{{base_url}}/api/task-lists/{{unknown_id}}/tasks/{{task_id}}'
 order: 12000
 headers:
   - key: Content-Type
@@ -18,6 +18,6 @@ scripts:
   - type: afterResponse
     language: text/javascript
     code: |-
-      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("status is 404", () => pm.response.to.have.status(404));
       pm.test("reports not found", () =>
         pm.expect(pm.response.json().message).to.eql("Task not found"));
