@@ -35,7 +35,7 @@ public class TaskListController {
         return taskListMappers.toDto(createdTaskList);
     }
 
-    @GetMapping(path = "/{task_list_id}/tasks")
+    @GetMapping(path = "/{task_list_id}")
     public Optional<TaskListDto> getTaskList(@PathVariable("task_list_id")UUID taskListId) {
         return taskListService.getTaskList(taskListId)
                 .map(taskListMappers::toDto);
@@ -50,7 +50,7 @@ public class TaskListController {
         return taskListMappers.toDto(updatedTaskList);
     }
 
-    @DeleteMapping(path = "/task_list_id")
+    @DeleteMapping(path = "/{task_list_id}")
     public void deleteTaskList(@PathVariable("task_list_id")UUID taskListId) {
         taskListService.deleteTaskList(taskListId);
     }
