@@ -1,6 +1,7 @@
 package com.george.tasktracker.controllers;
 
 import com.george.tasktracker.domain.dto.ErrorResponse;
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,5 +21,18 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            ResourceNotFoundException ex, WebRequest request)
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
