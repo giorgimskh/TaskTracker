@@ -1,8 +1,8 @@
-# Task Tracker
+# Task Tracker API
+
+![CI](https://github.com/giorgimskh/task-tracker-api/actions/workflows/ci.yml/badge.svg)
 
 A simple REST API for managing task lists and tasks. I built it with Spring Boot, Spring Data JPA and PostgreSQL.
-
-The repo is called Task-Tracker-CLI, but there is no CLI. It's a REST API.
 
 ## Features
 
@@ -10,7 +10,7 @@ The repo is called Task-Tracker-CLI, but there is no CLI. It's a REST API.
 - Create, read, update and delete tasks inside a task list
 - Tasks have a priority (LOW, MEDIUM, HIGH) and a status (OPEN, CLOSED)
 - A task list shows how many tasks it has and its progress (closed tasks / all tasks)
-- Invalid requests return a 400 error with a message
+- Invalid requests return 400 and missing task lists or tasks return 404, both with an error message
 
 ## Tech used
 
@@ -58,14 +58,24 @@ DELETE /api/task-lists/{task_list_id}
 Tasks:
 
 ```
-GET    /task_list/{task_list_id}/tasks
-POST   /task_list/{task_list_id}/tasks
-GET    /task_list/{task_list_id}/tasks/{task_id}
-PUT    /task_list/{task_list_id}/tasks/{task_id}
-DELETE /task_list/{task_list_id}/tasks/{task_id}
+GET    /api/task-lists/{task_list_id}/tasks
+POST   /api/task-lists/{task_list_id}/tasks
+GET    /api/task-lists/{task_list_id}/tasks/{task_id}
+PUT    /api/task-lists/{task_list_id}/tasks/{task_id}
+DELETE /api/task-lists/{task_list_id}/tasks/{task_id}
 ```
 
 Deleting a task list also deletes all of its tasks.
+
+### Status codes
+
+```
+200 OK          - GET and PUT worked
+201 Created     - POST created a task list or task
+204 No Content  - DELETE worked
+400 Bad Request - the request is invalid (for example a missing title)
+404 Not Found   - the task list or task doesn't exist
+```
 
 ### Example requests
 
@@ -99,7 +109,7 @@ When a list has tasks, `count` is the number of tasks and `progress` is a number
 Create a task (priority is optional, default is MEDIUM; status is always OPEN when you create a task):
 
 ```
-POST /task_list/{task_list_id}/tasks
+POST /api/task-lists/{task_list_id}/tasks
 {
   "title": "Buy milk",
   "description": "2 litres",
@@ -111,7 +121,7 @@ POST /task_list/{task_list_id}/tasks
 Update a task (id has to be the same as in the URL, and title, priority and status are required):
 
 ```
-PUT /task_list/{task_list_id}/tasks/{task_id}
+PUT /api/task-lists/{task_list_id}/tasks/{task_id}
 {
   "id": "{task_id}",
   "title": "Buy milk",
@@ -120,13 +130,21 @@ PUT /task_list/{task_list_id}/tasks/{task_id}
 }
 ```
 
-Error response example:
+Error response examples:
 
 ```
 {
   "status": 400,
   "message": "Task list title is required!",
   "details": "uri=/api/task-lists"
+}
+```
+
+```
+{
+  "status": 404,
+  "message": "Task list not found",
+  "details": "uri=/api/task-lists/00000000-0000-0000-0000-000000000000"
 }
 ```
 
@@ -143,6 +161,8 @@ The tests use an H2 in-memory database, so Postgres doesn't need to be running.
 - Service tests use Mockito
 - Mapper tests are plain JUnit tests
 - Controller tests use @SpringBootTest and MockMvc
+
+The tests also run on GitHub Actions on every push and pull request.
 
 ## Postman
 
@@ -163,18 +183,17 @@ The database and the app need to be running for this.
 ## Project structure
 
 ```
-Controllers   - REST controllers and the exception handler
-Services      - business logic and validation
-Repositories  - JPA repositories
+controllers   - REST controllers and the exception handler
+services      - business logic and validation
+repositories  - JPA repositories
 mappers       - convert between DTOs and entities
 domain        - entities and DTOs
+exceptions    - custom exceptions (ResourceNotFoundException)
 ```
 
 ## Things to improve
 
-- Return 404 when a task list or task is not found (right now it returns 200 with an empty body)
-- Use the same base path for both controllers (`/api/task-lists` and `/task_list/...`)
-- Return 204 for deletes
 - Add JPA auditing for the created/updated timestamps instead of setting them by hand
 - Use Bean Validation (`@Valid`, `@NotBlank`) instead of checking fields by hand in the services
-- Fix some error messages (a few have double spaces, and creating a task in a list that doesn't exist says "Invalid task ID")
+- Return 404 when deleting a task list or task that doesn't exist (right now it returns 204)
+- Validate the title when updating a task list
