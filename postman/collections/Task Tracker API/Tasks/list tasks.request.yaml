@@ -1,0 +1,17 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("returns both created tasks", () => {
+        pm.expect(body).to.be.an("array").with.lengthOf(2);
+        pm.expect(body.map(t => t.id)).to.include.members([
+          pm.collectionVariables.get("task_id"),
+          pm.collectionVariables.get("second_task_id")
+        ]);
+      });

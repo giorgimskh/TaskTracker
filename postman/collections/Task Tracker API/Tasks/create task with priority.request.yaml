@@ -1,0 +1,24 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Pay rent",
+      "priority": "HIGH",
+      "status": "CLOSED"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("keeps client priority", () => pm.expect(body.priority).to.eql("HIGH"));
+      pm.test("ignores client status, always OPEN", () => pm.expect(body.status).to.eql("OPEN"));
+      pm.collectionVariables.set("second_task_id", body.id);

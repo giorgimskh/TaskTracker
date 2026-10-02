@@ -1,0 +1,20 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "description": "no title"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("requires a title", () =>
+        pm.expect(pm.response.json().message).to.eql("Task  must have a title!"));

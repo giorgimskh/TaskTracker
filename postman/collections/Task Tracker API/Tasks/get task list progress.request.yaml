@@ -1,0 +1,13 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/api/task-lists/{{task_list_id}}'
+order: 13000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("count reflects both tasks", () => pm.expect(body.count).to.eql(2));
+      pm.test("progress is closed/total = 0.5", () => pm.expect(body.progress).to.eql(0.5));
+      pm.test("embeds the tasks", () => pm.expect(body.tasks).to.be.an("array").with.lengthOf(2));

@@ -1,0 +1,21 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/api/task-lists'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{unknown_id}}",
+      "title": "has an id"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("rejects client-supplied id", () =>
+        pm.expect(pm.response.json().message).to.eql("Task list already has an ID!"));

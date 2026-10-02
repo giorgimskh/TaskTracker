@@ -1,0 +1,23 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/task_list/{{unknown_id}}/tasks/{{task_id}}'
+order: 12000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{task_id}}",
+      "title": "x",
+      "priority": "LOW",
+      "status": "OPEN"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("reports not found", () =>
+        pm.expect(pm.response.json().message).to.eql("Task not found"));

@@ -1,0 +1,23 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/api/task-lists'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "description": "no title"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      const body = pm.response.json();
+      pm.test("error body explains the problem", () => {
+        pm.expect(body.status).to.eql(400);
+        pm.expect(body.message).to.eql("Task list title is required!");
+      });

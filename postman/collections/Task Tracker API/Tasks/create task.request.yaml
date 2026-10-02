@@ -1,0 +1,32 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Buy milk",
+      "description": "2 litres",
+      "dueDate": "2026-12-31"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("server assigns an id", () => pm.expect(body.id).to.be.a("string").and.not.empty);
+      pm.test("echoes fields", () => {
+        pm.expect(body.title).to.eql("Buy milk");
+        pm.expect(body.description).to.eql("2 litres");
+        pm.expect(body.dueDate).to.eql("2026-12-31");
+      });
+      pm.test("defaults to MEDIUM priority and OPEN status", () => {
+        pm.expect(body.priority).to.eql("MEDIUM");
+        pm.expect(body.status).to.eql("OPEN");
+      });
+      pm.collectionVariables.set("task_id", body.id);

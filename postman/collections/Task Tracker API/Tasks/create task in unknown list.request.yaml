@@ -1,0 +1,20 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/task_list/{{unknown_id}}/tasks'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "orphan"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("reports missing list", () =>
+        pm.expect(pm.response.json().message).to.eql("Invalid task ID"));

@@ -1,0 +1,13 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 16000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      pm.test("only the second task remains", () => {
+        const ids = pm.response.json().map(t => t.id);
+        pm.expect(ids).to.eql([pm.collectionVariables.get("second_task_id")]);
+      });

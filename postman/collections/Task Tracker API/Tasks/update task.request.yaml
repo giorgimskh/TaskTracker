@@ -1,0 +1,31 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks/{{task_id}}'
+order: 8000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{task_id}}",
+      "title": "Buy oat milk",
+      "description": "1 litre",
+      "dueDate": "2027-01-15",
+      "priority": "LOW",
+      "status": "CLOSED"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("all fields updated", () => {
+        pm.expect(body.title).to.eql("Buy oat milk");
+        pm.expect(body.description).to.eql("1 litre");
+        pm.expect(body.dueDate).to.eql("2027-01-15");
+        pm.expect(body.priority).to.eql("LOW");
+        pm.expect(body.status).to.eql("CLOSED");
+      });

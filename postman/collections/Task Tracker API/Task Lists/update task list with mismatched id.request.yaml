@@ -1,0 +1,21 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/api/task-lists/{{task_list_id}}'
+order: 8000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{unknown_id}}",
+      "title": "wrong id"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("rejects id change", () =>
+        pm.expect(pm.response.json().message).to.eql("not permitted to change Task list ID !"));

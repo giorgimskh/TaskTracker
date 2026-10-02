@@ -1,0 +1,23 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks/{{task_id}}'
+order: 9000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{second_task_id}}",
+      "title": "x",
+      "priority": "LOW",
+      "status": "OPEN"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 400", () => pm.response.to.have.status(400));
+      pm.test("rejects mismatched ids", () =>
+        pm.expect(pm.response.json().message).to.eql("Task IDs do not match"));

@@ -1,0 +1,8 @@
+$kind: collection
+name: Task Tracker API
+description: End-to-end tests for every endpoint. Run in order; requests share ids via collection variables.
+variables:
+  - key: base_url
+    value: 'http://localhost:8080'
+  - key: unknown_id
+    value: 00000000-0000-0000-0000-000000000000

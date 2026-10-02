@@ -1,0 +1,10 @@
+name: Local
+values:
+  - key: base_url
+    value: 'http://localhost:8080'
+    enabled: true
+    type: default
+  - key: unknown_id
+    value: 00000000-0000-0000-0000-000000000000
+    enabled: true
+    type: default

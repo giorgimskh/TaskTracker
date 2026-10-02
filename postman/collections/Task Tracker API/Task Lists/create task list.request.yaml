@@ -1,0 +1,27 @@
+$kind: http-request
+method: POST
+url: '{{base_url}}/api/task-lists'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Postman list",
+      "description": "created by postman"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("server assigns an id", () => pm.expect(body.id).to.be.a("string").and.not.empty);
+      pm.test("echoes title and description", () => {
+        pm.expect(body.title).to.eql("Postman list");
+        pm.expect(body.description).to.eql("created by postman");
+      });
+      pm.test("new list has no tasks", () => pm.expect(body.count).to.eql(0));
+      pm.collectionVariables.set("task_list_id", body.id);

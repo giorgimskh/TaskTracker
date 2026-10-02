@@ -1,0 +1,26 @@
+$kind: http-request
+method: PUT
+url: '{{base_url}}/api/task-lists/{{task_list_id}}'
+order: 7000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{task_list_id}}",
+      "title": "Postman list (renamed)",
+      "description": "updated by postman"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("title and description updated", () => {
+        pm.expect(body.title).to.eql("Postman list (renamed)");
+        pm.expect(body.description).to.eql("updated by postman");
+      });
+      pm.test("id unchanged", () => pm.expect(body.id).to.eql(pm.collectionVariables.get("task_list_id")));

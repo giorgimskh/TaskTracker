@@ -1,0 +1,13 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/api/task-lists'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("returns an array", () => pm.expect(body).to.be.an("array"));
+      pm.test("contains the created list", () =>
+        pm.expect(body.map(l => l.id)).to.include(pm.collectionVariables.get("task_list_id")));

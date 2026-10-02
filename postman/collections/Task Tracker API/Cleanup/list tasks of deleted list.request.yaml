@@ -1,0 +1,11 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks'
+order: 3000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      pm.test("remaining task was cascade-deleted", () =>
+        pm.expect(pm.response.json()).to.be.an("array").that.is.empty);

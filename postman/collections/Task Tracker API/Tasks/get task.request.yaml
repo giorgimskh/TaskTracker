@@ -1,0 +1,14 @@
+$kind: http-request
+method: GET
+url: '{{base_url}}/task_list/{{task_list_id}}/tasks/{{task_id}}'
+order: 6000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("status is 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("returns the requested task", () => {
+        pm.expect(body.id).to.eql(pm.collectionVariables.get("task_id"));
+        pm.expect(body.title).to.eql("Buy milk");
+      });
