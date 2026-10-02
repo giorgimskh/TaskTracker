@@ -3,11 +3,12 @@ package com.george.tasktracker.controllers;
 import com.george.tasktracker.services.TaskListService;
 import com.george.tasktracker.domain.dto.TaskListDto;
 import com.george.tasktracker.domain.entities.TaskList;
+import com.george.tasktracker.exceptions.ResourceNotFoundException;
 import com.george.tasktracker.mappers.TaskListMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -30,15 +31,17 @@ public class TaskListController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskListDto createTaskList(@RequestBody TaskListDto taskListDto) {
         TaskList createdTaskList = taskListService.createTaskList(taskListMappers.fromDto(taskListDto));
         return taskListMappers.toDto(createdTaskList);
     }
 
     @GetMapping(path = "/{task_list_id}")
-    public Optional<TaskListDto> getTaskList(@PathVariable("task_list_id")UUID taskListId) {
+    public TaskListDto getTaskList(@PathVariable("task_list_id")UUID taskListId) {
         return taskListService.getTaskList(taskListId)
-                .map(taskListMappers::toDto);
+                .map(taskListMappers::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Task list not found"));
     }
 
 @PutMapping(path = "/{task_list_id}")
@@ -51,6 +54,7 @@ public class TaskListController {
     }
 
     @DeleteMapping(path = "/{task_list_id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTaskList(@PathVariable("task_list_id")UUID taskListId) {
         taskListService.deleteTaskList(taskListId);
     }

@@ -44,26 +44,26 @@ class TasksControllerTest {
         String response = mockMvc.perform(post("/api/task-lists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"" + title + "\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return objectMapper.readTree(response).get("id").asText();
     }
 
     private String createTask(String taskListId, String title) throws Exception {
-        String response = mockMvc.perform(post("/task_list/" + taskListId + "/tasks")
+        String response = mockMvc.perform(post("/api/task-lists/" + taskListId + "/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"" + title + "\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return objectMapper.readTree(response).get("id").asText();
     }
 
     @Test
     void createTaskDefaultsToOpenAndMediumPriority() throws Exception {
-        mockMvc.perform(post("/task_list/" + taskListId + "/tasks")
+        mockMvc.perform(post("/api/task-lists/" + taskListId + "/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"Buy milk\",\"description\":\"2 litres\",\"dueDate\":\"2026-01-01\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.title").value("Buy milk"))
                 .andExpect(jsonPath("$.description").value("2 litres"))
@@ -74,7 +74,7 @@ class TasksControllerTest {
 
     @Test
     void createTaskWithoutTitleReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/task_list/" + taskListId + "/tasks")
+        mockMvc.perform(post("/api/task-lists/" + taskListId + "/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"description\":\"no title\"}"))
                 .andExpect(status().isBadRequest())
@@ -84,11 +84,12 @@ class TasksControllerTest {
     }
 
     @Test
-    void createTaskForUnknownListReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/task_list/00000000-0000-0000-0000-000000000000/tasks")
+    void createTaskForUnknownListReturnsNotFound() throws Exception {
+        mockMvc.perform(post("/api/task-lists/00000000-0000-0000-0000-000000000000/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"task\"}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Task list not found"));
 
         assertEquals(0, taskRepository.count());
     }
@@ -100,7 +101,7 @@ class TasksControllerTest {
         createTask(taskListId, "second");
         createTask(otherTaskListId, "other");
 
-        mockMvc.perform(get("/task_list/" + taskListId + "/tasks"))
+        mockMvc.perform(get("/api/task-lists/" + taskListId + "/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
@@ -109,7 +110,7 @@ class TasksControllerTest {
     void getTaskReturnsTask() throws Exception {
         String taskId = createTask(taskListId, "task");
 
-        mockMvc.perform(get("/task_list/" + taskListId + "/tasks/" + taskId))
+        mockMvc.perform(get("/api/task-lists/" + taskListId + "/tasks/" + taskId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(taskId))
                 .andExpect(jsonPath("$.title").value("task"));
@@ -119,7 +120,7 @@ class TasksControllerTest {
     void updateTaskUpdatesAllFields() throws Exception {
         String taskId = createTask(taskListId, "old");
 
-        mockMvc.perform(put("/task_list/" + taskListId + "/tasks/" + taskId)
+        mockMvc.perform(put("/api/task-lists/" + taskListId + "/tasks/" + taskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"" + taskId + "\",\"title\":\"new\",\"description\":\"changed\","
                                 + "\"dueDate\":\"2026-02-01\",\"priority\":\"HIGH\",\"status\":\"CLOSED\"}"))
@@ -135,7 +136,7 @@ class TasksControllerTest {
     void updateTaskWithMismatchedIdReturnsBadRequest() throws Exception {
         String taskId = createTask(taskListId, "task");
 
-        mockMvc.perform(put("/task_list/" + taskListId + "/tasks/" + taskId)
+        mockMvc.perform(put("/api/task-lists/" + taskListId + "/tasks/" + taskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"00000000-0000-0000-0000-000000000000\",\"title\":\"new\","
                                 + "\"priority\":\"HIGH\",\"status\":\"OPEN\"}"))
@@ -148,11 +149,40 @@ class TasksControllerTest {
         String taskId = createTask(taskListId, "delete me");
         createTask(taskListId, "keep me");
 
-        mockMvc.perform(delete("/task_list/" + taskListId + "/tasks/" + taskId))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/task-lists/" + taskListId + "/tasks/" + taskId))
+                .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/task_list/" + taskListId + "/tasks"))
+        mockMvc.perform(get("/api/task-lists/" + taskListId + "/tasks"))
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].title").value("keep me"));
+    }
+
+    @Test
+    void getUnknownTaskReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/api/task-lists/" + taskListId + "/tasks/00000000-0000-0000-0000-000000000000"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Task not found"));
+    }
+
+    @Test
+    void getTaskFromOtherListReturnsNotFound() throws Exception {
+        String otherTaskListId = createTaskList("other");
+        String taskId = createTask(taskListId, "task");
+
+        mockMvc.perform(get("/api/task-lists/" + otherTaskListId + "/tasks/" + taskId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateUnknownTaskReturnsNotFound() throws Exception {
+        String unknownId = "00000000-0000-0000-0000-000000000000";
+
+        mockMvc.perform(put("/api/task-lists/" + taskListId + "/tasks/" + unknownId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"" + unknownId + "\",\"title\":\"new\","
+                                + "\"priority\":\"HIGH\",\"status\":\"OPEN\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Task not found"));
     }
 }
