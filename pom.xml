@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.george</groupId>
-	<artifactId>task-tracker-cli</artifactId>
+	<artifactId>task-tracker-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>task-tracker-cli</name>
-	<description>Demo project for Spring Boot</description>
+	<name>task-tracker-api</name>
+	<description>REST API for managing task lists and tasks</description>
 	<url/>
 	<licenses>
 		<license/>
