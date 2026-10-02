@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="PersistenceUnitSettings">
-    <persistence-units>
-      <persistence-unit moduleName="task-tracker-cli" name="task-tracker-cli" framework="JPA" ormUnit="task-tracker-cli:task-tracker-cli" defaultDataSourceId="5df84da4-626a-4006-841a-f2415444c686" />
-    </persistence-units>
-  </component>
-</project>
