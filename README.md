@@ -1,7 +1,5 @@
 # Task Tracker API
 
-![CI](https://github.com/giorgimskh/task-tracker-api/actions/workflows/ci.yml/badge.svg)
-
 A simple REST API for managing task lists and tasks. I built it with Spring Boot, Spring Data JPA and PostgreSQL.
 
 ## Features
@@ -162,15 +160,11 @@ The tests use an H2 in-memory database, so Postgres doesn't need to be running.
 - Mapper tests are plain JUnit tests
 - Controller tests use @SpringBootTest and MockMvc
 
-The tests also run on GitHub Actions on every push and pull request.
-
 ## Postman
 
 There is a Postman collection in the `postman/` folder that tests every endpoint, including error cases. There is also a `Local` environment with `base_url = http://localhost:8080`.
 
 The collection creates its own test data and deletes it at the end. The requests need to run in order, because later requests use ids saved by earlier ones.
-
-I also keep the collection in my Postman workspace ("Task Tracker API"). There I select the "Local" environment and click "Run collection".
 
 To run it with the [Postman CLI](https://learning.postman.com/docs/postman-cli/postman-cli-installation/):
 

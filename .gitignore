@@ -32,3 +32,6 @@ target/
 
 # OS files
 .DS_Store
+
+# Postman workspace link (personal)
+.postman/

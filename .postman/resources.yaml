@@ -1,8 +1,0 @@
-cloudResources:
-  collections:
-    ../postman/collections/Task Tracker API: 56627197-eed008e4-37eb-4248-a432-8153cdfd2c9c
-  environments:
-    ../postman/environments/Local.environment.yaml: 56627197-4abe9194-b6d8-41a8-9d4f-1b18bb1f04d2
-workspace:
-  id: 1b8c8caa-bc43-4764-b095-3bbf2f5be081
-  name: Task Tracker API
